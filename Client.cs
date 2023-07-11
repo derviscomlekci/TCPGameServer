@@ -10,69 +10,98 @@ namespace TCPGameServer
 {
     public class Client
     {
-        private static int dataBufferSize = 4096;//4 mb
         public int id;
         public TCP tcp;
-
-        public Client(int _clientId)
+        public Client(int _id)
         {
-            id = _clientId;
-            tcp=new TCP(id);
+            id = _id;
+            tcp=new TCP(_id);
         }
 
         public class TCP
         {
             public TcpClient socket;
+            public NetworkStream stream;
+            public byte[] buffer;//veri alışverişleri için
+            public readonly int id;
 
-            private readonly int id;
+            //
+            public string Name;
+            //
 
-            private NetworkStream stream;
-            private byte[] receiveBuffer;
-
-            public TCP(int _id)
+            public TCP(int id) 
+            { 
+                this.id = id;
+            }
+            public void Disconnect()
             {
-                id = _id;
+                if (socket != null && socket.Connected)//***********
+                    socket.Close();
+
+                if (stream != null)
+                    stream.Close();
+                socket = null;
+                stream = null;
+                Name = null;
             }
             public void Connect(TcpClient _socket)
             {
-                socket = _socket;
-                socket.ReceiveBufferSize=dataBufferSize; 
-                socket.SendBufferSize=dataBufferSize;
+                socket=_socket;
+                socket.ReceiveBufferSize = Server.dataBufferSize;//Oyuncudan gelecek buffer büyüklüğü.
+                socket.SendBufferSize=Server.dataBufferSize;//oyuncuya gönderilecek buffer büyüklüğü.
 
                 stream=socket.GetStream();
-                receiveBuffer = new byte[dataBufferSize];
+                buffer=new byte[Server.dataBufferSize];// ilk başta vermemizin sebebi kullanıcı yokken boşa buffer tutmamak.
 
-                stream.BeginRead(receiveBuffer, 0, dataBufferSize, ReceiveCallback, null);
-
-                //TODO: sende welcome packet
-
-
-
+                stream.BeginRead(buffer, 0, Server.dataBufferSize, ReceiveCallback, null);
+            
             }
-            public void ReceiveCallback(IAsyncResult _result)
+            //Burada kullanıcıdan veri gelirse veriyi kontrol edip işleyeceğiz.
+            public void ReceiveCallback(IAsyncResult asyncResult)
             {
                 try
                 {
-                    int _byteLength = stream.EndRead(_result);
-                    if (_byteLength <= 0)
+                    int receivedDataSize=stream.EndRead(asyncResult);
+                    if (receivedDataSize <= 0) //Bağlantıya ne olmuş diye  bakacağız. Burada patlamış 0 dan küçük
                     {
-                        //TODO: disconnect
+                        Disconnect();
                         return;
                     }
-                    byte[] data=new byte[_byteLength];
-                    Array.Copy(receiveBuffer, data, _byteLength); 
-                    //TODO: handle data
-                    stream.BeginRead(receiveBuffer,0,dataBufferSize,ReceiveCallback,null);
+                    //Patlamamışsa
+                    byte[] data=new byte[receivedDataSize];
+                    Array.Copy(buffer, data, receivedDataSize);//dataya bufferden gelenleri kopyalıyoruz.
+                    
+                    //gelen veriyi jsona çevirip handle için yolluyoruz.
+                    string receivedJsonData=Encoding.UTF8.GetString(data);
+                    Handlers.Handle(receivedJsonData);
+
+                    stream.BeginRead(buffer,0,Server.dataBufferSize, ReceiveCallback, null);
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Console.WriteLine($"Error receiving TCP data:{ex}");
-                    //TODO:disconnect
-                    throw;
+                    //Disconnect;
+                    Disconnect();
+                    return;
                 }
             }
-
+            public void SendDataFromJson(string jsonData)
+            {
+                byte[] _data=Encoding.UTF8.GetBytes(jsonData);
+                try
+                {
+                    stream.BeginWrite(_data,0,_data.Length,SendCallback,null);
+                }
+                catch (Exception)
+                {
+                    Disconnect();
+                    return;
+                }
+            }
+            public void SendCallback(IAsyncResult  asyncResult )
+            {
+                stream.EndRead(asyncResult);
+            }
         }
     }
 }

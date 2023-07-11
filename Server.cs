@@ -5,56 +5,82 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace TCPGameServer
 {
     public class Server
     {
-        public static int MaxPlayers { get;private set; }
-        public static int Port { get; private set; }
-
-        public static Dictionary<int,Client> Clients =new Dictionary<int, Client>();
-
         
-        private static TcpListener tcpListener;
+        public static TcpListener tcpListener;
 
-        public static void Start(int  _maxPlayer,int _port)
+        //Burada 20 kişilik bi koltuk sistemi hazırlamış olduk.
+        //Katılan oyuncular buraya oturacak.
+        public static Dictionary<int,Client> clientsDic = new Dictionary<int,Client>();
+        public static int MaxPlayers = 20;
+        public static int PORT = 26950;
+        public static int dataBufferSize = 4096;
+
+        public static void SetupServer()
         {
-            MaxPlayers = _maxPlayer;
-            Port = _port;
-            Console.WriteLine("Starting server...");
-            InitializeServerData();
-
-
-            tcpListener = new TcpListener(IPAddress.Any, Port);
-            tcpListener.Start();
-            tcpListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectCallback), null);
-
-            Console.WriteLine($"Server started on {Port}.");
+            //Sadece buradan gelen istekleri kabul etmesi için
+            tcpListener = new TcpListener(IPAddress.Any, PORT);
+            SetClients();
+            Console.WriteLine($"Server is ready.Max Player {MaxPlayers}");
         }
-        private  static void TCPConnectCallback(IAsyncResult _result)
+        public static void StartServer()
         {
-            TcpClient _client = tcpListener.EndAcceptTcpClient(_result);
-            tcpListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectCallback), null);
-            Console.WriteLine($"Incoming connection from {_client.Client.RemoteEndPoint}...");
-            for (int i = 1; i<= MaxPlayers; i++)
+            tcpListener.Start();//Start listening received clients
+            //Burada içeriye alım yapıyoruz.
+            tcpListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallBack), null);// buradaki null karşıya bi veri göndermememiz.
+            Console.WriteLine("Server is listening...");
+
+        }
+        public static void AcceptCallBack(IAsyncResult asyncResult)
+        {
+            TcpClient socket=tcpListener.EndAcceptTcpClient(asyncResult);
+
+
+            //bir kullanıcı aldıktan sonra başka bir kullanıcı gelirse diye tekrar yazıyoruz.
+            tcpListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallBack), null);
+
+            for (int i=1; i<=MaxPlayers; i++) 
             {
-                if (Clients[i].tcp.socket==null)
+                if (clientsDic[i].tcp.socket==null)//koltuk boşsa
                 {
-                    Clients[i].tcp.Connect(_client);
+                    //yerleştirip return edicez.
+                    clientsDic[i].tcp.Connect(socket);//Oyuncu artık içeride
+ 
+                    Console.WriteLine("A new player connected");
+                    //Oyuncuya hello gönderiyoruz.
+                    clientsDic[i].tcp.SendDataFromJson(JsonConvert
+                        .SerializeObject(Handlers.Create_Hello(clientsDic[i].tcp.id, (int)Handlers.Server.Hello, "Connection succesfull...")));
+
+
                     return;
                 }
             }
-            Console.WriteLine($"{_client.Client.RemoteEndPoint} failed to connect:Server full!");
+            try
+            {
+                socket.Close();
+                return;
+            }
+            catch (Exception)
+            {
 
+            }
+            
 
+  
         }
-        private static void InitializeServerData()
+        public static void SetClients()
         {
             for (int i = 1; i <= MaxPlayers; i++)
             {
-                Clients.Add(i, new Client(i));
+                clientsDic.Add(i, new Client(i));
             }
         }
+
     }
 }
