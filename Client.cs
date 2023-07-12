@@ -25,6 +25,9 @@ namespace TCPGameServer
             public byte[] buffer;//veri alışverişleri için
             public readonly int id;
 
+            //Variables
+            public bool isSearchGame;
+
             //
             public string Name;
             //
@@ -42,7 +45,9 @@ namespace TCPGameServer
                     stream.Close();
                 socket = null;
                 stream = null;
+                Console.WriteLine($"{Name}' isimli oyuncu çıktı.");
                 Name = null;
+                buffer = null;
             }
             public void Connect(TcpClient _socket)
             {
@@ -76,6 +81,7 @@ namespace TCPGameServer
                     Handlers.Handle(receivedJsonData);
 
                     stream.BeginRead(buffer,0,Server.dataBufferSize, ReceiveCallback, null);
+
 
                 }
                 catch (Exception)

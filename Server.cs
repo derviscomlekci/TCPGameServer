@@ -55,7 +55,7 @@ namespace TCPGameServer
                     Console.WriteLine("A new player connected");
                     //Oyuncuya hello gönderiyoruz.
                     clientsDic[i].tcp.SendDataFromJson(JsonConvert
-                        .SerializeObject(Handlers.Create_Hello(clientsDic[i].tcp.id, (int)Handlers.Server.Hello, "Connection succesfull...")));
+                        .SerializeObject(Handlers.Create_Hello(clientsDic[i].tcp.id, (int)Handlers.ServerEnum.Hello, "Connection succesfull...")));
 
 
                     return;
