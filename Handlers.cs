@@ -13,12 +13,15 @@ namespace TCPGameServer
         public enum ServerEnum
         {
             Hello = 1,
-            SearchGame = 2
+            SearchGame = 2,
+            ConnectRoom=3
         }
         public enum ClientEnum
         {
             Hello = 1,
-            SearchGame = 2
+            SearchGame = 2,
+            ConnectRoom = 3
+
         }
 
         public static void Handle(string jsonData)
@@ -84,16 +87,41 @@ namespace TCPGameServer
         }
         public static void GetSearch(SearchPacket packet)
         {
+
             Server.clientsDic[packet.id].tcp.isSearchGame = packet.search;
             Server.clientsDic[packet.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(CreateSearch(packet.id, (int)ServerEnum.SearchGame, packet.search, false)));
-            if (packet.search)
+            
+            if (packet.search)//Arama yapılıyorsa başka arayan bir kullanıcı bulucaz.
             {
                 Console.WriteLine($"{Server.clientsDic[packet.id].tcp.Name}'den arama isteği geldi. Aranıyor");
+                for (int i = 1; i <= Server.MaxPlayers; i++)
+                {
+                    if (Server.clientsDic[i].tcp.isSearchGame && packet.id!=i)
+                    {
+
+                        for (int x = 1;x<=Server.roomsDic.Count;x++)
+                        {
+                            if (!Server.roomsDic[x].isRoomFull)
+                            {
+                                //Boş bir oda varsa
+                                Server.roomsDic[x].StartRoom(i, packet.id);
+                                //Eşleştirme yazılacak.
+                                Server.clientsDic[i].tcp.SendDataFromJson(JsonConvert.SerializeObject(CreateSearch(i, (int)ServerEnum.SearchGame, false, true)));
+                                Server.clientsDic[packet.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(CreateSearch(packet.id, (int)ServerEnum.SearchGame, false, true)));
+                                
+                                Console.WriteLine(Server.clientsDic[i].tcp.Name + " ve " + Server.clientsDic[packet.id].tcp.Name + " arasında bağlantı kuruldu.Oda numarası :"+x);
+                                return;
+
+                            }
+                        }
+                       
+                    }
+                }
 
             }
             else
             {
-                Console.WriteLine($"{Server.clientsDic[packet.id]}'den gelen arama isteği iptal edildi.");
+                Console.WriteLine($"{Server.clientsDic[packet.id].tcp.Name}'den gelen arama isteği iptal edildi.");
             }
         }
     }

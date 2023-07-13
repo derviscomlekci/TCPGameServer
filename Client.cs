@@ -24,9 +24,10 @@ namespace TCPGameServer
             public NetworkStream stream;
             public byte[] buffer;//veri alışverişleri için
             public readonly int id;
+            public int roomId;
 
             //Variables
-            public bool isSearchGame;
+            public bool isSearchGame=false;
 
             //
             public string Name;
@@ -48,6 +49,7 @@ namespace TCPGameServer
                 Console.WriteLine($"{Name}' isimli oyuncu çıktı.");
                 Name = null;
                 buffer = null;
+                isSearchGame = false;
             }
             public void Connect(TcpClient _socket)
             {

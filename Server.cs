@@ -18,6 +18,7 @@ namespace TCPGameServer
         //Burada 20 kişilik bi koltuk sistemi hazırlamış olduk.
         //Katılan oyuncular buraya oturacak.
         public static Dictionary<int,Client> clientsDic = new Dictionary<int,Client>();
+        public static Dictionary<int,Room> roomsDic = new Dictionary<int, Room>();
         public static int MaxPlayers = 20;
         public static int PORT = 26950;
         public static int dataBufferSize = 4096;
@@ -27,6 +28,7 @@ namespace TCPGameServer
             //Sadece buradan gelen istekleri kabul etmesi için
             tcpListener = new TcpListener(IPAddress.Any, PORT);
             SetClients();
+            SetRooms();
             Console.WriteLine($"Server is ready.Max Player {MaxPlayers}");
         }
         public static void StartServer()
@@ -79,6 +81,13 @@ namespace TCPGameServer
             for (int i = 1; i <= MaxPlayers; i++)
             {
                 clientsDic.Add(i, new Client(i));
+            }
+        }
+        public static void SetRooms()
+        {
+            for(int i = 1;i <= MaxPlayers/2; i++)
+            {
+                roomsDic.Add(i, new Room(i));
             }
         }
 
