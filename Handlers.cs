@@ -14,13 +14,15 @@ namespace TCPGameServer
         {
             Hello = 1,
             SearchGame = 2,
-            ConnectRoom=3
+            ConnectRoom = 3,
+            ChatMessage = 4
         }
         public enum ClientEnum
         {
             Hello = 1,
             SearchGame = 2,
-            ConnectRoom = 3
+            ConnectRoom = 3,
+            ChatMessage = 4
 
         }
 
@@ -36,6 +38,14 @@ namespace TCPGameServer
                 case (int)ClientEnum.SearchGame:
                     {
                         GetSearch(JsonConvert.DeserializeObject<SearchPacket>(jsonData)); break;
+                    }
+                case (int)ClientEnum.ConnectRoom:
+                    {
+                        Get_ConnectRoom(JsonConvert.DeserializeObject<ConnectRoom>(jsonData)); break;
+                    }
+                case (int)ClientEnum.ChatMessage:
+                    {
+                        Get_ChatMessage(JsonConvert.DeserializeObject<ChatMessage>(jsonData)); break;
                     }
 
                 default:
@@ -85,36 +95,37 @@ namespace TCPGameServer
             searchPacket.found = _found;
             return searchPacket;
         }
+
         public static void GetSearch(SearchPacket packet)
         {
 
             Server.clientsDic[packet.id].tcp.isSearchGame = packet.search;
             Server.clientsDic[packet.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(CreateSearch(packet.id, (int)ServerEnum.SearchGame, packet.search, false)));
-            
+
             if (packet.search)//Arama yapılıyorsa başka arayan bir kullanıcı bulucaz.
             {
                 Console.WriteLine($"{Server.clientsDic[packet.id].tcp.Name}'den arama isteği geldi. Aranıyor");
                 for (int i = 1; i <= Server.MaxPlayers; i++)
                 {
-                    if (Server.clientsDic[i].tcp.isSearchGame && packet.id!=i)
+                    if (Server.clientsDic[i].tcp.isSearchGame && packet.id != i)
                     {
 
-                        for (int x = 1;x<=Server.roomsDic.Count;x++)
+                        for (int x = 1; x <= Server.roomsDic.Count; x++)
                         {
                             if (!Server.roomsDic[x].isRoomFull)
                             {
                                 //Boş bir oda varsa
-                                Server.roomsDic[x].StartRoom(i, packet.id);
+                                Server.roomsDic[x].StartRoom(Server.clientsDic[i].tcp.id, Server.clientsDic[packet.id].tcp.id);
                                 //Eşleştirme yazılacak.
                                 Server.clientsDic[i].tcp.SendDataFromJson(JsonConvert.SerializeObject(CreateSearch(i, (int)ServerEnum.SearchGame, false, true)));
                                 Server.clientsDic[packet.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(CreateSearch(packet.id, (int)ServerEnum.SearchGame, false, true)));
-                                
-                                Console.WriteLine(Server.clientsDic[i].tcp.Name + " ve " + Server.clientsDic[packet.id].tcp.Name + " arasında bağlantı kuruldu.Oda numarası :"+x);
+
+                                // Console.WriteLine(Server.clientsDic[i].tcp.Name + " ve " + Server.clientsDic[packet.id].tcp.Name + " arasında bağlantı kuruldu.Oda numarası :"+x);
                                 return;
 
                             }
                         }
-                       
+
                     }
                 }
 
@@ -124,6 +135,49 @@ namespace TCPGameServer
                 Console.WriteLine($"{Server.clientsDic[packet.id].tcp.Name}'den gelen arama isteği iptal edildi.");
             }
         }
+        public class ConnectRoom : Packet
+        {
+            public bool isConnect;
+        }
+
+        public static ConnectRoom CreateConnectRoom(int _id, int _type, bool _connect)
+        {
+            ConnectRoom packet = new ConnectRoom();
+            packet.id = _id;
+            packet.type = _type;
+            packet.isConnect = _connect;
+            return packet;
+        }
+        public static void Get_ConnectRoom(ConnectRoom packet)
+        {
+            if (!packet.isConnect)
+            {
+                Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].PlayerDisconnectRoom(packet.id);//oyuncu odadan çıktıysa
+                return;
+            }
+
+            Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].PlayerConnectRoom(packet.id);//oyuncu sahneyi yükledi ve hazır
+            return;
+
+        }
+        public class ChatMessage : Packet
+        {
+            public string message;
+        }
+        public static ChatMessage ChreateChatMessage(int _id, int _type, string _message)
+        {
+            ChatMessage packet = new ChatMessage();
+            packet.id = _id;
+            packet.type = _type;
+            packet.message = _message;
+            return packet;
+
+        }
+        public static void Get_ChatMessage(ChatMessage packet)
+        {
+            Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].SendChatMessage($"{Server.clientsDic[packet.id].tcp.Name}: "+ packet.message);
+        }
+
     }
 }
 

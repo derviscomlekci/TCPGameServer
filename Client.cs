@@ -24,7 +24,8 @@ namespace TCPGameServer
             public NetworkStream stream;
             public byte[] buffer;//veri alışverişleri için
             public readonly int id;
-            public int roomId;
+            public int roomId=-1;
+
 
             //Variables
             public bool isSearchGame=false;
@@ -50,6 +51,10 @@ namespace TCPGameServer
                 Name = null;
                 buffer = null;
                 isSearchGame = false;
+                if (roomId != -1)
+                {
+                    Server.roomsDic[roomId].PlayerDisconnectRoom(id);
+                }
             }
             public void Connect(TcpClient _socket)
             {
