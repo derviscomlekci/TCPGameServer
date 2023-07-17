@@ -10,5 +10,6 @@ namespace TCPGameServer.HandlerFolder
     [SocketController]
     public class BaseHandler
     {
+
     }
 }
