@@ -9,8 +9,8 @@ namespace TCPGameServer.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public class SocketActionAttribute : Attribute
     {
-        private Opcodes opcode;
-        private Authorise role;
+        public Opcodes opcode;
+        public Authorise role;
 
         public SocketActionAttribute(Opcodes opcode, Authorise role)
         {

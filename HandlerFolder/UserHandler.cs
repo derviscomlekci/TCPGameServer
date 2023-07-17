@@ -14,7 +14,7 @@ namespace TCPGameServer.HandlerFolder
 
         }
 
-        [SocketAction(Opcodes.GetUser,"user")]
+        [SocketAction(Opcodes.GetUser,Authorise.User)]
         public async Task Get()
         {
 

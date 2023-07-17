@@ -1,4 +1,6 @@
 ﻿using System;
+using TCPGameServer.Attributes;
+using TCPGameServer.HandlerFolder;
 
 namespace TCPGameServer
 {
@@ -10,6 +12,7 @@ namespace TCPGameServer
             Server.SetupServer();
             Server.StartServer();
             Console.ReadKey();
+            var attribute =(SocketActionAttribute)Attribute.GetCustomAttribute(typeof(ProductHandler), typeof(SocketActionAttribute));
         }
     }
 }
