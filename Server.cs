@@ -43,7 +43,6 @@ namespace TCPGameServer
         {
             TcpClient socket=tcpListener.EndAcceptTcpClient(asyncResult);
 
-
             //bir kullanıcı aldıktan sonra başka bir kullanıcı gelirse diye tekrar yazıyoruz.
             tcpListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallBack), null);
 
@@ -72,7 +71,6 @@ namespace TCPGameServer
             {
 
             }
-            
 
   
         }

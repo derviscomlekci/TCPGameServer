@@ -30,6 +30,9 @@ namespace TCPGameServer
             player2.id = _player2Id;
             Server.clientsDic[player1.id].tcp.roomId = roomId;
             Server.clientsDic[player2.id].tcp.roomId = roomId;
+            Server.clientsDic[player1.id].tcp.isSearchGame = false;
+            Server.clientsDic[player2.id].tcp.isSearchGame = false;
+            isRoomFull = true;
             
         }
         public void ClearRoom()
@@ -85,10 +88,10 @@ namespace TCPGameServer
                 Console.WriteLine($"Tum oyuncular çıktı. Oda numarası:{roomId}");
             }
         }
-        public void SendChatMessage(string _message)
+        public void SendChatMessage(string _message,int senderId)
         {
-            Server.clientsDic[player1.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player1.id, (int)(Handlers.ServerEnum.ChatMessage), _message)));
-            Server.clientsDic[player2.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player2.id, (int)(Handlers.ServerEnum.ChatMessage), _message)));
+            Server.clientsDic[player1.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player1.id, (int)(Handlers.ServerEnum.ChatMessage), _message, senderId)));
+            Server.clientsDic[player2.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player2.id, (int)(Handlers.ServerEnum.ChatMessage), _message, senderId)));
         }
 
         public class Player

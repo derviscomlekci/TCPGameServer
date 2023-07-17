@@ -48,13 +48,13 @@ namespace TCPGameServer
                 socket = null;
                 stream = null;
                 Console.WriteLine($"{Name}' isimli oyuncu çıktı.");
-                Name = null;
                 buffer = null;
                 isSearchGame = false;
                 if (roomId != -1)
                 {
                     Server.roomsDic[roomId].PlayerDisconnectRoom(id);
                 }
+                Name = null;
             }
             public void Connect(TcpClient _socket)
             {
