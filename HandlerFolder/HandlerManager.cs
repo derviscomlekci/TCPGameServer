@@ -73,7 +73,7 @@ namespace TCPGameServer.HandlerFolder
 
                             });
                             //var aav = (type)Activator.CreateInstance(type, true);
-                            Expression<Action> fun = Expression.Lambda<Action>(Expression.Call((Expression)aav,method));
+                            //Expression<Action> fun = Expression.Lambda<Action>(Expression.Call((Expression)aav,method));
 
                             Action hello=fun.Compile();
                             Action<object, byte[]> compiledMethod = lambda.Compile();
