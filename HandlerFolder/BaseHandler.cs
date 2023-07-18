@@ -10,6 +10,10 @@ namespace TCPGameServer.HandlerFolder
     [SocketController]
     public class BaseHandler
     {
+        public void CartCurt()
+        {
+
+        }
 
     }
 }

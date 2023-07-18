@@ -13,6 +13,7 @@ namespace TCPGameServer
         ConnectRoom = 3,
         ChatMessage = 4,
         GetProduct = 5,
-        GetUser = 6
+        GetUser = 6,
+        SetUser=7
     }
 }

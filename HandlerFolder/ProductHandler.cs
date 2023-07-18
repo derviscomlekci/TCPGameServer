@@ -15,10 +15,11 @@ namespace TCPGameServer.HandlerFolder
 
         }
 
-        [SocketAction(Opcodes.GetProduct,Authorise.User )]
-        public async Task Get()
+        [SocketAction(Opcodes.GetProduct,Authorise.Admin )]
+        public async Task GetHandler()
         {
-
+            await Console.Out.WriteLineAsync("Get product handler called.");
         }
+
     }
 }
