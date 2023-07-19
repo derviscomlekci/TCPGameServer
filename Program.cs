@@ -4,7 +4,7 @@ using System.Reflection.Metadata;
 using TCPGameServer.Attributes;
 using System.Collections.Generic;
 using TCPGameServer.HandlerFolder;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TCPGameServer
 {
@@ -13,11 +13,15 @@ namespace TCPGameServer
         static void Main(string[] args)
         {
             Console.Title = "GameServer";
+            var serviceProvider = new ServiceCollection()
+            .AddSingleton<IFooService, FooService>()
+            .AddSingleton<IBarService, BarService>()
+            .BuildServiceProvider();
 
-            
-            HandlerManager handlerManager = new HandlerManager();
-            object[] denemeArray = new object[] { "dervis", 5 };
-            handlerManager.RunHandler(Opcodes.GetUser,denemeArray);
+            HandlerManager manager = new HandlerManager();
+            //HandlerManager handlerManager = new HandlerManager();
+            //object[] denemeArray = new object[] { "dervis", 5 };
+            //handlerManager.RunHandler(Opcodes.SetUser,null);
             
 
             Server.SetupServer();
@@ -25,36 +29,6 @@ namespace TCPGameServer
             Console.ReadKey();
 
         }
-
-        /*
-        public static IEnumerable<Type> GetTypesWithMyAttribute()
-        {
-            var asmbly = Assembly.GetExecutingAssembly();
-            foreach (Type type in asmbly.GetTypes())
-            {
-                if (Attribute.IsDefined(type, typeof(SocketControllerAttribute)))
-                    yield return type;
-            }
-        }
-
-        static List<Type> GetClassesWithAttribute<T>() where T : Attribute
-        {
-            List<Type> attributedClasses = new List<Type>();
-
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            Type[] types = assembly.GetTypes();
-
-            foreach (var type in types)
-            {
-                if (type.GetCustomAttribute<T>() != null)
-                {
-                    attributedClasses.Add(type);
-                }
-            }
-
-            return attributedClasses;
-        }
-        */
 
     }
 }

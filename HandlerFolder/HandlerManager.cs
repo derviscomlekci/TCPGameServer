@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -13,12 +14,18 @@ namespace TCPGameServer.HandlerFolder
 {
     public class HandlerManager
     {
+        #region Deneme listeleri
+        //public List<SocketControllerAttribute> socketAttributeList = new List<SocketControllerAttribute>();
+        //public List<MethodInfo> methodInfos = new List<MethodInfo>();
+        //public List<Type> classes = new List<Type>();
+        //public List<SocketControllerAttribute> controllerlist = new List<SocketControllerAttribute>();
+        #endregion
 
-        public List<SocketControllerAttribute> socketAttributeList = new List<SocketControllerAttribute>();
-        public List<MethodInfo> methodInfos = new List<MethodInfo>();
-        public List<Type> classes = new List<Type>();
-        public List<SocketControllerAttribute> controllerlist = new List<SocketControllerAttribute>();
-        public Dictionary<Opcodes, MethodInfo> controllerDict =new Dictionary<Opcodes, MethodInfo>();
+
+        public Dictionary<Opcodes, MethodInfo> controllerMethodDict = new Dictionary<Opcodes, MethodInfo>();
+        public Dictionary<Type, object> controllerInstanceDict = new Dictionary<Type, object>();
+
+
         public HandlerManager()
         {
             TestGetControllers();
@@ -26,13 +33,13 @@ namespace TCPGameServer.HandlerFolder
 
         public async Task RunHandler(Opcodes opcode, object[] objectArray)
         {
-            MethodInfo method =controllerDict[opcode];
+            MethodInfo method = controllerMethodDict[opcode];
             Type methodtype = method.DeclaringType;
-            object instance = Activator.CreateInstance(methodtype);
+            object instance = controllerInstanceDict[methodtype];
 
             ParameterInfo[] parameters = method.GetParameters();//if function has parameters it will get
- 
-            if (parameters.Length==0)
+
+            if (parameters.Length == 0)
             {
                 method.Invoke(instance, null);
             }
@@ -40,7 +47,6 @@ namespace TCPGameServer.HandlerFolder
             {
                 method.Invoke(instance, objectArray);
             }
-
             await Console.Out.WriteLineAsync();
 
         }
@@ -51,18 +57,25 @@ namespace TCPGameServer.HandlerFolder
             foreach (Type type in types)
             {
                 SocketControllerAttribute controller = type.GetCustomAttribute<SocketControllerAttribute>();
-                if (type.IsSubclassOf(typeof(BaseHandler)) && controller !=null)
+                if (type.IsSubclassOf(typeof(BaseHandler)) && controller != null)
                 {
 
-                    controllerlist.Add(controller);
+                    //controllerlist.Add(controller);
                     MethodInfo[] methods = type.GetMethods();
-                    foreach(MethodInfo method in methods)
+                    foreach (MethodInfo method in methods)
                     {
                         SocketActionAttribute socketActionAttribute = method.GetCustomAttribute<SocketActionAttribute>();
                         if (socketActionAttribute != null)
                         {
+                            controllerMethodDict.Add(socketActionAttribute.opcode, method);
 
-                            controllerDict.Add(socketActionAttribute.opcode, method);
+                            //Creating instance of methods and adding to dictionary
+                            Type methodtype = method.DeclaringType;
+                            if (!controllerInstanceDict.ContainsKey(methodtype))
+                            {
+                                object instance = Activator.CreateInstance(methodtype);
+                                controllerInstanceDict.Add(methodtype, instance);
+                            }
 
                             #region Furkan
 
@@ -97,8 +110,6 @@ namespace TCPGameServer.HandlerFolder
                             // Expression<Action> fun = Expression.Lambda<Action>(Expression.Call((Expression)aav,method));
                             //Action hello=fun.Compile();
                             #endregion
-
-                            //Console.WriteLine(socketActionAttribute.opcode+"   "+method.Name);
                         }
 
                     }

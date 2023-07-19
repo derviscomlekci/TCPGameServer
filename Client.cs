@@ -12,6 +12,7 @@ namespace TCPGameServer
     {
         public int id;
         public TCP tcp;
+        
         public Client(int _id)
         {
             id = _id;

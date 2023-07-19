@@ -5,11 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TCPGameServer.HandlerFolder;
 
 namespace TCPGameServer
 {
     public class Handlers
     {
+        private readonly IHandler _handler;
+        public Handlers(IHandler handler)
+        {
+            _handler = handler;
+        }
         public enum ServerEnum
         {
             Hello = 1,
@@ -26,14 +32,21 @@ namespace TCPGameServer
 
         }
 
-        public static void Handle(string jsonData)
+        public void Handle(string jsonData)
         {
+            //HandlerManager handlerManager = new HandlerManager();
             Packet mainPacket = JsonConvert.DeserializeObject<Packet>(jsonData);
+            object[] dataArray = new object[] {};
+
+            _handler.RunHandler((Opcodes)mainPacket.type, dataArray);
+            /*
             switch (mainPacket.type)
             {
                 case (int)ClientEnum.Hello:
                     {
-                        Get_Hello(JsonConvert.DeserializeObject<Hello>(jsonData)); break;
+                        handlerManager.RunHandler(Opcodes.GetProduct, dataArray);
+                        //Get_Hello(JsonConvert.DeserializeObject<Hello>(jsonData)); 
+                        break;
                     }
                 case (int)ClientEnum.SearchGame:
                     {
@@ -50,7 +63,7 @@ namespace TCPGameServer
                 default:
                     break;
             }
-
+            */
         }
         public class Packet
         {
