@@ -12,7 +12,7 @@ using TCPGameServer.Attributes;
 
 namespace TCPGameServer.HandlerFolder
 {
-    public class HandlerManager
+    public class HandlerManager: IHandler
     {
         #region Deneme listeleri
         //public List<SocketControllerAttribute> socketAttributeList = new List<SocketControllerAttribute>();

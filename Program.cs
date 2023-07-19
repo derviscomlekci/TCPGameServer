@@ -14,8 +14,7 @@ namespace TCPGameServer
         {
             Console.Title = "GameServer";
             var serviceProvider = new ServiceCollection()
-            .AddSingleton<IFooService, FooService>()
-            .AddSingleton<IBarService, BarService>()
+            .AddSingleton<IHandler, HandlerManager>()
             .BuildServiceProvider();
 
             HandlerManager manager = new HandlerManager();

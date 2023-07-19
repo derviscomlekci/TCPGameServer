@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace TCPGameServer.HandlerFolder
 {
-    internal class IHandler
+    public interface IHandler
     {
+        Task RunHandler(Opcodes opcode, object[] objectArray);
     }
 }
