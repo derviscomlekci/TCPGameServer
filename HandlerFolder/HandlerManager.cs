@@ -18,18 +18,31 @@ namespace TCPGameServer.HandlerFolder
         public List<MethodInfo> methodInfos = new List<MethodInfo>();
         public List<Type> classes = new List<Type>();
         public List<SocketControllerAttribute> controllerlist = new List<SocketControllerAttribute>();
-        public Dictionary<Opcodes, Action> controllerDict=new Dictionary<Opcodes, Action>();
+        public Dictionary<Opcodes, MethodInfo> controllerDict =new Dictionary<Opcodes, MethodInfo>();
         public HandlerManager()
         {
             TestGetControllers();
         }
 
-        public async Task RunHandler(Opcodes opcode)
+        public async Task RunHandler(Opcodes opcode, object[] objectArray)
         {
-            var a =controllerDict[Opcodes.GetProduct];
-            byte[] bosarray=null;
-            object instance = null;
-            a.Invoke();
+            MethodInfo method =controllerDict[opcode];
+            Type methodtype = method.DeclaringType;
+            object instance = Activator.CreateInstance(methodtype);
+
+            ParameterInfo[] parameters = method.GetParameters();//if function has parameters it will get
+ 
+            if (parameters.Length==0)
+            {
+                method.Invoke(instance, null);
+            }
+            else
+            {
+                method.Invoke(instance, objectArray);
+            }
+
+            await Console.Out.WriteLineAsync();
+
         }
         public void TestGetControllers()
         {
@@ -49,17 +62,18 @@ namespace TCPGameServer.HandlerFolder
                         if (socketActionAttribute != null)
                         {
 
-                            //controllerDict.Add(socketActionAttribute.opcode, method);
+                            controllerDict.Add(socketActionAttribute.opcode, method);
 
+                            #region Furkan
 
                             /*
                              (object instance, byte[] data) => {
                                 ((ProductHandler)instance).Handle(data);
                              }
                              
-                             */
+                             
 
-                            
+                            //Type typename = type;
                             ParameterExpression prmInstance = Expression.Parameter(typeof(object), "instance");
                             ParameterExpression prmData = Expression.Parameter(typeof(byte[]), "data");
 
@@ -72,14 +86,19 @@ namespace TCPGameServer.HandlerFolder
                                 prmData,
 
                             });
-                            //var aav = (type)Activator.CreateInstance(type, true);
-                            //Expression<Action> fun = Expression.Lambda<Action>(Expression.Call((Expression)aav,method));
-
-                           // Action hello=fun.Compile();
                             Action<object, byte[]> compiledMethod = lambda.Compile();
-                            //controllerDict.Add(socketActionAttribute.opcode, hello);
+                            //controllerDict.Add(socketActionAttribute.opcode, compiledMethod);
+                            */
+                            #endregion
+                            #region Alperen
+                            //var aav = Activator.CreateInstance(type);
 
-                            Console.WriteLine(socketActionAttribute.opcode+"   "+method.Name);
+
+                            // Expression<Action> fun = Expression.Lambda<Action>(Expression.Call((Expression)aav,method));
+                            //Action hello=fun.Compile();
+                            #endregion
+
+                            //Console.WriteLine(socketActionAttribute.opcode+"   "+method.Name);
                         }
 
                     }

@@ -14,19 +14,12 @@ namespace TCPGameServer
         {
             Console.Title = "GameServer";
 
-
             
-            //List<SocketActionAttribute> socketAttributeList = new List<SocketActionAttribute>();
             HandlerManager handlerManager = new HandlerManager();
-            /*
-            foreach (var item in handlerManager.socketAttributeList)
-            {
-                Console.WriteLine($"Opcode: {item.opcode}");
-                Console.WriteLine($"Role: {item.role}");
-            }
-            */
-            handlerManager.RunHandler(Opcodes.GetUser);
-            //Console.WriteLine("");
+            object[] denemeArray = new object[] { "dervis", 5 };
+            handlerManager.RunHandler(Opcodes.GetUser,denemeArray);
+            
+
             Server.SetupServer();
             Server.StartServer();
             Console.ReadKey();
