@@ -15,8 +15,15 @@ namespace TCPGameServer.HandlerFolder
 
         }
 
-        [SocketAction(Opcodes.GetUser,Authorise.User)]
-        public async Task GetHandler()
+        [SocketAction(Opcodes.LoginUser,Authorise.User)]
+        public async Task LoginUser()
+        {
+            //await Console.Out.WriteLineAsync(deneme+" "+ deneme2.ToString());
+
+            await Console.Out.WriteLineAsync("Get user handler called.");
+        }
+        [SocketAction(Opcodes.RegisterUser, Authorise.User)]
+        public async Task RegisterUser()
         {
             //await Console.Out.WriteLineAsync(deneme+" "+ deneme2.ToString());
 
