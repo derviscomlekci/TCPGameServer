@@ -5,15 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using TCPGameServer.Services;
 
 namespace TCPGameServer
 {
-    public class Client
+    public class ClientOld
     {
         public int id;
         public TCP tcp;
         
-        public Client(int _id)
+        public ClientOld(int _id)
         {
             id = _id;
             tcp=new TCP(_id);
@@ -86,7 +87,7 @@ namespace TCPGameServer
                     
                     //gelen veriyi jsona çevirip handle için yolluyoruz.
                     string receivedJsonData=Encoding.UTF8.GetString(data);
-                    Handlers.Handle(receivedJsonData);
+                    //Handlers.Handle(receivedJsonData);
 
                     stream.BeginRead(buffer,0,Server.dataBufferSize, ReceiveCallback, null);
 

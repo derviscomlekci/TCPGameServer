@@ -7,29 +7,32 @@ using System.Net.Sockets;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TCPGameServer.HandlerFolder;
 
-namespace TCPGameServer
+namespace TCPGameServer.Services
 {
     public class Server
     {
-        
+
         public static TcpListener tcpListener;
 
         //Burada 20 kişilik bi koltuk sistemi hazırlamış olduk.
         //Katılan oyuncular buraya oturacak.
-        public static Dictionary<int,Client> clientsDic = new Dictionary<int,Client>();
-        public static Dictionary<int,Room> roomsDic = new Dictionary<int, Room>();
-        public static int MaxPlayers = 20;
+        public static Dictionary<int, Client> clientsDic = new Dictionary<int, Client>();
+        public static List<Client> clientsList = new List<Client>();
+        public static Dictionary<int, Room> roomsDic = new Dictionary<int, Room>();
+       // public static int MaxPlayers = 20;
         public static int PORT = 26950;
         public static int dataBufferSize = 4096;
+        public static HandlerManager _handlerManager = new HandlerManager();
 
         public static void SetupServer()
         {
             //Sadece buradan gelen istekleri kabul etmesi için
             tcpListener = new TcpListener(IPAddress.Any, PORT);
-            SetClients();
-            SetRooms();
-            Console.WriteLine($"Server is ready.Max Player {MaxPlayers}");
+            //SetClients();
+            //SetRooms();
+            Console.WriteLine($"Server is ready");
         }
         public static void StartServer()
         {
@@ -41,24 +44,27 @@ namespace TCPGameServer
         }
         public static void AcceptCallBack(IAsyncResult asyncResult)
         {
-            TcpClient socket=tcpListener.EndAcceptTcpClient(asyncResult);
+            TcpClient socket = tcpListener.EndAcceptTcpClient(asyncResult);
 
             //bir kullanıcı aldıktan sonra başka bir kullanıcı gelirse diye tekrar yazıyoruz.
             tcpListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallBack), null);
 
-            for (int i=1; i<=MaxPlayers; i++) 
+            Client newClient = new Client(_handlerManager);
+            newClient.Connect(socket);
+            clientsList.Add(newClient);
+
+            /*
+            for (int i = 1; i <= MaxPlayers; i++)
             {
-                if (clientsDic[i].tcp.socket==null)//koltuk boşsa
+                if (clientsDic[i].socket == null)//koltuk boşsa
                 {
                     //yerleştirip return edicez.
-                    clientsDic[i].tcp.Connect(socket);//Oyuncu artık içeride
- 
+                    clientsDic[i].Connect(socket);//Oyuncu artık içeride
+
                     Console.WriteLine("A new player connected");
                     //Oyuncuya hello gönderiyoruz.
-                    clientsDic[i].tcp.SendDataFromJson(JsonConvert
-                        .SerializeObject(Handlers.Create_Hello(clientsDic[i].tcp.id, (int)Handlers.ServerEnum.Hello, "Connection succesfull...")));
-
-
+                    clientsDic[i].SendDataFromJson(JsonConvert
+                        .SerializeObject(Handlers.Create_Hello(clientsDic[i].id, (int)Handlers.ServerEnum.Hello, "Connection succesfull...")));
                     return;
                 }
             }
@@ -71,9 +77,11 @@ namespace TCPGameServer
             {
 
             }
+            */
 
-  
+
         }
+        /*
         public static void SetClients()
         {
             for (int i = 1; i <= MaxPlayers; i++)
@@ -81,13 +89,16 @@ namespace TCPGameServer
                 clientsDic.Add(i, new Client(i));
             }
         }
+        */
+        /*
         public static void SetRooms()
         {
-            for(int i = 1;i <= MaxPlayers/2; i++)
+            for (int i = 1; i <= MaxPlayers / 2; i++)
             {
                 roomsDic.Add(i, new Room(i));
             }
         }
+        */
 
     }
 }

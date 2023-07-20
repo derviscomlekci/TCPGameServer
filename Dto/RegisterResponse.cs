@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace TCPGameServer.Dto
 {
-    public class LoginPacket
+    public class RegisterResponse 
     {
-        public string username;
-        public string password;
+        public bool IsRegistered { get; set; }
+        public string Message { get; set; }
+
     }
 }

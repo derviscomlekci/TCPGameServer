@@ -1,14 +1,18 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
 using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using TCPGameServer.Attributes;
+using TCPGameServer.Dto;
+using TCPGameServer.Services;
 
 namespace TCPGameServer.HandlerFolder
 {
@@ -26,9 +30,17 @@ namespace TCPGameServer.HandlerFolder
         public Dictionary<Type, object> controllerInstanceDict = new Dictionary<Type, object>();
 
 
+        IClient _client;
         public HandlerManager()
         {
             TestGetControllers();
+        }
+        public async Task PacketReceived(string jsonData)
+        {
+            Packet mainPacket = JsonConvert.DeserializeObject<Packet>(jsonData);
+            //RegisterPacket  regpack= JsonConvert.DeserializeObject<RegisterPacket>(jsonData);
+            object[] dataArray = new object[] { jsonData };
+            RunHandler((Opcodes)mainPacket.opcode, dataArray);
         }
 
         public async Task RunHandler(Opcodes opcode, object[] objectArray)

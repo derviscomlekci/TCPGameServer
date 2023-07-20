@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TCPGameServer.HandlerFolder;
+using TCPGameServer.Services;
 
 namespace TCPGameServer
 {
@@ -87,8 +88,8 @@ namespace TCPGameServer
 
         public static void Get_Hello(Hello packet)
         {
-            Server.clientsDic[packet.id].tcp.Name = packet.name;
-            Console.WriteLine($"Player name: {packet.name}");
+            //Server.clientsDic[packet.id].Name = packet.name;
+            //Console.WriteLine($"Player name: {packet.name}");
         }
         public class SearchPacket : Packet
         {
@@ -118,6 +119,7 @@ namespace TCPGameServer
 
         public static void GetSearch(SearchPacket packet)
         {
+            /*
 
             Server.clientsDic[packet.id].tcp.isSearchGame = packet.search;
             Server.clientsDic[packet.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(new SearchPacket().CreateSearch(packet.id, (int)ServerEnum.SearchGame, packet.search, false)));
@@ -154,6 +156,7 @@ namespace TCPGameServer
             {
                 Console.WriteLine($"{Server.clientsDic[packet.id].tcp.Name}'den gelen arama isteği iptal edildi.");
             }
+            */
         }
         public class ConnectRoom : Packet
         {
@@ -169,7 +172,7 @@ namespace TCPGameServer
             return packet;
         }
         public static void Get_ConnectRoom(ConnectRoom packet)
-        {
+        {/*
             if (!packet.isConnect)
             {
                 Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].PlayerDisconnectRoom(packet.id);//oyuncu odadan çıktıysa
@@ -178,7 +181,7 @@ namespace TCPGameServer
 
             Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].PlayerConnectRoom(packet.id);//oyuncu sahneyi yükledi ve hazır
             return;
-
+            */
         }
         public class ChatMessage : Packet
         {
@@ -197,7 +200,7 @@ namespace TCPGameServer
         }
         public static void Get_ChatMessage(ChatMessage packet)
         {
-            Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].SendChatMessage($"{Server.clientsDic[packet.id].tcp.Name}: " + packet.message, packet.id);
+           // Server.roomsDic[Server.clientsDic[packet.id].tcp.roomId].SendChatMessage($"{Server.clientsDic[packet.id].tcp.Name}: " + packet.message, packet.id);
         }
 
     }

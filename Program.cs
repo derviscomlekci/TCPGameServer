@@ -5,6 +5,7 @@ using TCPGameServer.Attributes;
 using System.Collections.Generic;
 using TCPGameServer.HandlerFolder;
 using Microsoft.Extensions.DependencyInjection;
+using TCPGameServer.Services;
 
 namespace TCPGameServer
 {
@@ -15,9 +16,10 @@ namespace TCPGameServer
             Console.Title = "GameServer";
             var serviceProvider = new ServiceCollection()
             .AddSingleton<IHandler, HandlerManager>()
+            .AddSingleton<IClient, Client>()
             .BuildServiceProvider();
 
-            HandlerManager manager = new HandlerManager();
+           // HandlerManager manager = new HandlerManager();
             //HandlerManager handlerManager = new HandlerManager();
             //object[] denemeArray = new object[] { "dervis", 5 };
             //handlerManager.RunHandler(Opcodes.SetUser,null);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using TCPGameServer.Services;
 
 namespace TCPGameServer
 {
@@ -28,10 +29,10 @@ namespace TCPGameServer
         {
             player1.id = _player1Id;
             player2.id = _player2Id;
-            Server.clientsDic[player1.id].tcp.roomId = roomId;
-            Server.clientsDic[player2.id].tcp.roomId = roomId;
-            Server.clientsDic[player1.id].tcp.isSearchGame = false;
-            Server.clientsDic[player2.id].tcp.isSearchGame = false;
+            Server.clientsDic[player1.id].roomId = roomId;
+            Server.clientsDic[player2.id].roomId = roomId;
+            Server.clientsDic[player1.id].isSearchGame = false;
+            Server.clientsDic[player2.id].isSearchGame = false;
             isRoomFull = true;
             
         }
@@ -63,20 +64,20 @@ namespace TCPGameServer
             {
                 return;
             }
-            if(player1.isInRoom && player2.isInRoom)
-                Console.WriteLine($"Room number:{roomId}, Oyuncular: {Server.clientsDic[player1.id].tcp.Name}, {Server.clientsDic[player2.id].tcp.Name}");
+           // if(player1.isInRoom && player2.isInRoom)
+              //  Console.WriteLine($"Room number:{roomId}, Oyuncular: {Server.clientsDic[player1.id].tcp.Name}, {Server.clientsDic[player2.id].tcp.Name}");
         }
         public void PlayerDisconnectRoom(int _id)
         {
             if (player1.id == _id)
             {
                 player1.isInRoom = false;
-                Console.WriteLine($"{Server.clientsDic[_id].tcp.Name}' isimli oyuncu {roomId}' numaralı odadan çıktı.");
+               // Console.WriteLine($"{Server.clientsDic[_id].tcp.Name}' isimli oyuncu {roomId}' numaralı odadan çıktı.");
             }
             else if (player2.id == _id)
             {
                 player2.isInRoom = false;
-                Console.WriteLine($"{Server.clientsDic[_id].tcp.Name}' isimli oyuncu {roomId}' numaralı odadan çıktı.");
+               // Console.WriteLine($"{Server.clientsDic[_id].tcp.Name}' isimli oyuncu {roomId}' numaralı odadan çıktı.");
             }
             else
             {
@@ -90,8 +91,8 @@ namespace TCPGameServer
         }
         public void SendChatMessage(string _message,int senderId)
         {
-            Server.clientsDic[player1.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player1.id, (int)(Handlers.ServerEnum.ChatMessage), _message, senderId)));
-            Server.clientsDic[player2.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player2.id, (int)(Handlers.ServerEnum.ChatMessage), _message, senderId)));
+            //Server.clientsDic[player1.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player1.id, (int)(Handlers.ServerEnum.ChatMessage), _message, senderId)));
+           // Server.clientsDic[player2.id].tcp.SendDataFromJson(JsonConvert.SerializeObject(Handlers.ChreateChatMessage(player2.id, (int)(Handlers.ServerEnum.ChatMessage), _message, senderId)));
         }
 
         public class Player

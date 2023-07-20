@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TCPGameServer.Dto
 {
-    public class LoginPacket
+    public class LoginResponse
     {
-        public string username;
-        public string password;
+        public bool IsLoggedIn { get; set; }
+        public string ErrorMessage;
     }
 }

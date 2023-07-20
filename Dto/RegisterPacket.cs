@@ -11,6 +11,6 @@ namespace TCPGameServer.Dto
         public string username;
         public string password;
         public string tckno;
-        public string adress;
+        public string address;
     }
 }
