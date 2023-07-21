@@ -18,6 +18,7 @@ namespace TCPGameServer.Services
         public byte[] buffer;//veri alışverişleri için
         //public readonly int id;
         public int roomId = -1;
+        string receivedData;
 
         //Variables
         public bool isSearchGame = false;
@@ -63,7 +64,7 @@ namespace TCPGameServer.Services
 
         }
         //Burada kullanıcıdan veri gelirse veriyi kontrol edip işleyeceğiz.
-        public void ReceiveCallback(IAsyncResult asyncResult)
+        public async void ReceiveCallback(IAsyncResult asyncResult)
         {
             try
             {
@@ -79,9 +80,10 @@ namespace TCPGameServer.Services
 
                 //gelen veriyi jsona çevirip handle için yolluyoruz.
                 string receivedJsonData = Encoding.UTF8.GetString(data);
-               // Handlers.Handle(receivedJsonData);
-                _handler.PacketReceived(receivedJsonData);
-
+                // Handlers.Handle(receivedJsonData);
+                
+                receivedData=await _handler.PacketReceived(receivedJsonData);
+                SendDataFromJson(receivedJsonData);
                 stream.BeginRead(buffer, 0, Server.dataBufferSize, ReceiveCallback, null);
 
 

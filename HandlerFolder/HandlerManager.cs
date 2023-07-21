@@ -35,31 +35,35 @@ namespace TCPGameServer.HandlerFolder
         {
             TestGetControllers();
         }
-        public async Task PacketReceived(string jsonData)
+        public async Task<string> PacketReceived(string jsonData)
         {
             Packet mainPacket = JsonConvert.DeserializeObject<Packet>(jsonData);
             //RegisterPacket  regpack= JsonConvert.DeserializeObject<RegisterPacket>(jsonData);
             object[] dataArray = new object[] { jsonData };
-            RunHandler((Opcodes)mainPacket.opcode, dataArray);
+            string data=(string) await RunHandler((Opcodes)mainPacket.opcode, dataArray);
+           // _client.SendDataFromJson(data);
+            return data;
         }
 
-        public async Task RunHandler(Opcodes opcode, object[] objectArray)
+        public async Task<string> RunHandler(Opcodes opcode, object[] objectArray)
         {
             MethodInfo method = controllerMethodDict[opcode];
             Type methodtype = method.DeclaringType;
             object instance = controllerInstanceDict[methodtype];
 
             ParameterInfo[] parameters = method.GetParameters();//if function has parameters it will get
+            string jsondata;
 
             if (parameters.Length == 0)
             {
-                method.Invoke(instance, null);
+                jsondata=(string)method.Invoke(instance, null);
             }
             else
             {
-                method.Invoke(instance, objectArray);
+                jsondata = (string)method.Invoke(instance, objectArray);
             }
             await Console.Out.WriteLineAsync();
+            return jsondata;
 
         }
         public void TestGetControllers()

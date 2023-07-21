@@ -8,7 +8,7 @@ namespace TCPGameServer.HandlerFolder
 {
     public interface IHandler
     {
-        Task RunHandler(Opcodes opcode, object[] objectArray);
-        Task PacketReceived(string jsonData);
+        Task<string> RunHandler(Opcodes opcode, object[] objectArray);
+        Task<string> PacketReceived(string jsonData);
     }
 }

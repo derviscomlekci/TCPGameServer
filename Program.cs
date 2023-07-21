@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using TCPGameServer.HandlerFolder;
 using Microsoft.Extensions.DependencyInjection;
 using TCPGameServer.Services;
+using TCPGameServer.Dto;
+using MessagePack;
 
 namespace TCPGameServer
 {
@@ -14,6 +16,12 @@ namespace TCPGameServer
         static void Main(string[] args)
         {
             Console.Title = "GameServer";
+
+            //string jsonFile=MessagePackSerializer.ConvertToJson(bytes);
+            //string directJson = MessagePackSerializer.SerializeToJson(packet);
+
+
+
             var serviceProvider = new ServiceCollection()
             .AddSingleton<IHandler, HandlerManager>()
             .AddSingleton<IClient, Client>()
